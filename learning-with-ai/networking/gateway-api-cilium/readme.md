@@ -5,15 +5,18 @@
 kubectl create ns infra-gateway
 kubectl create ns site-a
 kubectl create ns site-b
+
+### Create Gateway 
+kubectl apply -f gateway.yaml --namespace=infra-gateway
+### To check 
+kubectl get gtw -n infra-gateway
+
 ### Add workload to site a and b
 # Deploy to Site A
 kubectl run web-a -n site-a --expose --port=5678 --image=hashicorp/http-echo -- -text="Welcome to Site A"
 # Deploy to Site B
 kubectl run web-b -n site-b --expose --port=5678 --image=hashicorp/http-echo -- -text="Welcome to Site B"
-### Create Gateway 
-kubectl apply -f gateway.yaml --namespace=infra-gateway
-### To check 
-kubectl get gtw -n infra-gateway
+
 
 ### Because you are on a MacBook using Kind, there is no "Cloud Provider" to give you an External IP. To solve this for your hands-on without installing MetalLB, you have two choices:
 ### Option A (Recommended): Open a new terminal tab and run cloud-provider-kind. (Install it via brew install cloud-provider-kind). This will "bridge" Kind to your Mac.
