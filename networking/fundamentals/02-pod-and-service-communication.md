@@ -9,6 +9,8 @@ This practical explains how Kubernetes networking works by testing:
 
 By the end, you will understand how Services provide stable access even when pod IPs change.
 
+If you want to learn the concept in detail, refer to my blog: [Read the blog here](https://claybrainer.com/kubernetes-networking-part-1-the-fundamentals).
+
 ## Prerequisites
 
 Make sure you have:

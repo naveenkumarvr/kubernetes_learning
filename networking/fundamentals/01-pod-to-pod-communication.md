@@ -2,7 +2,7 @@
 
 In Kubernetes, pods can communicate directly over the cluster network without an intermediate network layer.
 
-If you want to learn the concept in detail, refer to my blog: [Read the blog here](<BLOG_URL_PLACEHOLDER>).
+If you want to learn the concept in detail, refer to my blog: [Read the blog here](https://claybrainer.com/kubernetes-networking-part-1-the-fundamentals).
 
 This document is the practical companion to that blog and demonstrates the behavior with a simple hands-on test.
 
