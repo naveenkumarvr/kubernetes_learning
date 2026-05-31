@@ -12,5 +12,6 @@ That section explains how to create a local Kind-based Kubernetes cluster and pr
 
 ## Topics
 
-- [Networking](networking/)
-    - [Cilium](networking/cilium/Readme.md)
+- Networking
+    - [Networking Fundamentals](networking/fundamentals/)
+        - [Pod-to-Pod Communication (Practical)](networking/fundamentals/01-pod-to-pod-communication.md)
