@@ -15,3 +15,4 @@ That section explains how to create a local Kind-based Kubernetes cluster and pr
 - Networking
     - [Networking Fundamentals](networking/fundamentals/)
         - [Pod-to-Pod Communication (Practical)](networking/fundamentals/01-pod-to-pod-communication.md)
+        - [Pod and Service Communication (Practical)](networking/fundamentals/02-pod-and-service-communication.md)
