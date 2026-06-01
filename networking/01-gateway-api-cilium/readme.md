@@ -28,7 +28,7 @@ kubectl create ns site-b
 # Install if you haven't yet
 `brew install cloud-provider-kind`
 # Run the provider (keep this tab open)
-`sudo cloud-provider-kind`¯
+`sudo cloud-provider-kind`
 # Now you will see IP
 `kubectl get gtw -n infra-gateway`
 
