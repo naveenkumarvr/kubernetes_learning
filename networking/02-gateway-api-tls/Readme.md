@@ -50,7 +50,7 @@ status:
       type: Accepted
     - reason: Programmed
       status: "True"
-      type: Programmed
+      type: ResolvedRefs
 ```
 
 ### Verify Gateway Certificate Resolution Status

@@ -6,7 +6,8 @@ metadata:
 spec:
   parentRefs:
   - name: tls-gateway
-    namespace: default
+    namespace: tls-gtw
+    # namespace: default
   hostnames:
   - "claybrainer.lab"
   rules:
