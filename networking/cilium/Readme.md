@@ -76,7 +76,7 @@ kubectl get nodes
 ## Install Required CRDs
 - Before running that install command, verify that the Kubernetes Gateway API CRDs (Custom Resource Definitions) are installed.
 ```bash
-kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.1.0/standard-install.yam
+kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.1.0/standard-install.yaml
 ```
 
 ## Install Cilium
