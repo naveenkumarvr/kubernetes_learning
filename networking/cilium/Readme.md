@@ -131,3 +131,14 @@ Make sure all Cilium components are up and running before moving to the next sec
 Reference status screenshot:
 
 ![Cilium status in kube-system](images/cilium-status.png)
+
+
+## Kind Local LoadBalancer
+- Because you are on a MacBook using Kind, there is no "Cloud Provider" to give you an External IP. To solve this for your hands-on without installing MetalLB, you have two choices:
+- Option A (Recommended): Open a new terminal tab and run cloud-provider-kind. (Install it via brew install cloud-provider-kind). This will "bridge" Kind to your Mac.
+- Option B: Use kubectl port-forward to the Gateway service Cilium created.
+- We will go with option 1 cloud-provider-kind
+### Install if you haven't yet
+`brew install cloud-provider-kind`
+### Run the provider (keep this tab open)
+`sudo cloud-provider-kind`
