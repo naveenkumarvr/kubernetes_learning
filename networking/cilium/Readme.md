@@ -72,6 +72,13 @@ kubectl get nodes
 - The `k8sServiceHost` value is read from the Kind control-plane container IP so Cilium can connect to the Kubernetes API server correctly in this local setup.
 - Gateway API and Hubble are enabled during installation because later sections in this repository depend on those features.
 
+
+## Install Required CRDs
+- Before running that install command, verify that the Kubernetes Gateway API CRDs (Custom Resource Definitions) are installed.
+```bash
+kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.1.0/standard-install.yam
+```
+
 ## Install Cilium
 
 Run the following command to install Cilium:
