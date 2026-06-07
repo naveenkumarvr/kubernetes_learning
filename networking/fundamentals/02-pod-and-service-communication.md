@@ -142,20 +142,44 @@ Pod -> Pod IP
 ```
 
 ## Step 4: Inspect EndpointSlices
+To see the list of pods assigned to endpoints, use:
 
-List EndpointSlices:
+```bash
+kubectl get endpoints
+```
+
+This command displays all **Endpoints** attached to your Services.
+
+### Notes
+- **Endpoints** directly show the list of pod IPs backing a Service.
+- This is considered the **legacy** approach.
+- Kubernetes now commonly uses **EndpointSlices**, which provide a more scalable and modern way to manage endpoint information.
+
+### Which One Should You Use?
+You can use **both**, depending on your needs:
+
+| Resource | Purpose |
+|----------|---------|
+| `Endpoints` | Directly shows the list of pods attached to a Service |
+| `EndpointSlices` | Groups endpoints into manageable chunks for better scalability |
+
+## List EndpointSlices
+
+To view all EndpointSlices:
 
 ```bash
 kubectl get endpointslices
 ```
 
-Describe the EndpointSlice for `nginx-service`:
+## Describe an EndpointSlice
+
+To inspect the EndpointSlice for `nginx-service`:
 
 ```bash
 kubectl describe endpointslice <ENDPOINTSLICE_NAME>
 ```
 
-You will see pod IPs for healthy backends. This is how Kubernetes knows where to route Service traffic.
+You will see the **pod IPs for healthy backends**. This is how Kubernetes knows where to route Service traffic.
 
 ## Step 5: Test Pod Failure and Recovery
 
