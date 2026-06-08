@@ -1,0 +1,35 @@
+# Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+  namespace: policy-lab
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: frontend
+  template:
+    metadata:
+      labels:
+        app: frontend
+    spec:
+      containers:
+      - name: web
+        image: wbitt/network-multitool
+        ports:
+        - containerPort: 80
+
+---
+# Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend
+  namespace: policy-lab
+spec:
+  ports:
+  - port: 80
+    targetPort: 80
+  selector:
+    app: frontend

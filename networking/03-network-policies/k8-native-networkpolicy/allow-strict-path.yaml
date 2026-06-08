@@ -1,0 +1,87 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: frontend-policy
+  namespace: policy-lab
+spec:
+  podSelector:
+    matchLabels:
+      app: frontend
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress: [] # Default Deny Ingress (No pods need to initiate connections to frontend)
+  egress:
+  - ports:    # Foolproof DNS Whitelist: Allows outgoing DNS lookups anywhere
+    - protocol: UDP
+      port: 53
+    - protocol: TCP
+      port: 53
+  - to:       # Target Whitelist: Can talk out to backend pods on port 80
+    - podSelector:
+        matchLabels:
+          app: backend
+    ports:
+    - protocol: TCP
+      port: 80
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: backend-policy
+  namespace: policy-lab
+spec:
+  podSelector:
+    matchLabels:
+      app: backend
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+  - from:     # Target Whitelist: Accepts traffic ONLY from frontend pods
+    - podSelector:
+        matchLabels:
+          app: frontend
+    ports:
+    - protocol: TCP
+      port: 80
+  egress:
+  - ports:    # Foolproof DNS Whitelist
+    - protocol: UDP
+      port: 53
+    - protocol: TCP
+      port: 53
+  - to:       # Target Whitelist: Can talk out to database pods on port 80
+    - podSelector:
+        matchLabels:
+          app: database
+    ports:
+    - protocol: TCP
+      port: 80
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: database-policy
+  namespace: policy-lab
+spec:
+  podSelector:
+    matchLabels:
+      app: database
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+  - from:     # Target Whitelist: Accepts traffic ONLY from backend pods
+    - podSelector:
+        matchLabels:
+          app: backend
+    ports:
+    - protocol: TCP
+      port: 80
+  egress:
+  - ports:    # Foolproof DNS Whitelist (Database might need DNS for external lookups)
+    - protocol: UDP
+      port: 53
+    - protocol: TCP
+      port: 53
