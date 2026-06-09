@@ -1,6 +1,6 @@
 # Kubernetes NetworkPolicy Learning Guide
 
-This README explains the file allow-strict-path.yaml in detail so you can understand exactly how traffic is controlled in this lab.
+This README explains the file allowStrictPath.yaml in detail so you can understand exactly how traffic is controlled in this lab.
 
 ## Goal of this policy set
 
@@ -24,7 +24,7 @@ frontend -> backend -> database
 
 ## File walkthrough by line ranges
 
-Source file: allow-strict-path.yaml
+Source file: allowStrictPath.yaml
 
 ### Document 1: frontend-policy (lines 1 to 27)
 

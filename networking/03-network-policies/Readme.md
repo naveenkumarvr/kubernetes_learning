@@ -1,6 +1,6 @@
 # Kubernetes Native Network Policies
 
-In this section we will see how to configure Kubernetes Native network policies and what are its adv and disadv
+In this section we will see how to configure Kubernetes native network policies, along with their advantages and limitations.
 
 ## How Native Kubernetes Network Policies Work
 Before writing YAML, there are three fundamental rules you must understand about native Kubernetes network policies:
@@ -26,35 +26,51 @@ Because the Service layer vanishes before the firewall rules are evaluated, your
 
 ## Practical Implementation
 
-- Create Namespace `kubectl create ns policy-lab`
-- Deploy Three tier application
+- Create namespace:
+    ```bash
+    kubectl create ns policy-lab
+    ```
+- Deploy three-tier application:
     ```bash
     kubectl apply -f app/db.yaml -n policy-lab
-
     kubectl apply -f app/backend.yaml -n policy-lab
-
     kubectl apply -f app/frontend.yaml -n policy-lab
     ```
-- Deploy the policy `kubectl apply -f k8-native-networkpolicy/allow-strict-path.yaml`
+- Deploy the strict path policy:
+    ```bash
+    kubectl apply -f k8NativeNetworkpolicy/allowStrictPath.yaml -n policy-lab
+    ```
+
+Policy file reference:
+
+- k8NativeNetworkpolicy/allowStrictPath.yaml
+- Detailed learning notes: k8NativeNetworkpolicy/Readme.md
 
 ### Testing
 ```bash
 # Frontend to Backend
 kubectl exec -n policy-lab deploy/frontend -- curl --connect-timeout 3 -s -o /dev/null -w "%{http_code}\n" http://backend
 
-## Expected Ouput: 200
+## Expected Output: 200
 
 
 # Backend to DB
 kubectl exec -n policy-lab deploy/backend -- curl --connect-timeout 3 -s -o /dev/null -w "%{http_code}\n" http://database
 
 
-## Expected Ouput: 200
+## Expected Output: 200
 
 
 # Frontend to Direct DB
 kubectl exec -n policy-lab deploy/frontend -- curl --connect-timeout 3 http://database
 
 
-## Expected Ouput: curl: (28) Connection timed out
+## Expected Output: curl: (28) Connection timed out
 ```
+
+Quick policy behavior summary:
+
+1. frontend -> backend:80 is allowed
+2. backend -> database:80 is allowed
+3. frontend -> database:80 is denied
+4. DNS egress on UDP/TCP 53 is allowed for all three workloads
