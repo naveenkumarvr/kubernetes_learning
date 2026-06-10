@@ -38,6 +38,12 @@ spec:
 
 ```bash
 kubectl apply -f cilium-l7-policy.yaml
+
+# To Check the policy
+kubectl get ciliumnetworkpolicy -A
+
+# To Describe
+kubectl describe ciliumnetworkpolicy backend-l7-policy  -n policy-lab
 ```
 
 ### Testing
@@ -57,3 +63,9 @@ Our network-multitool web server handles any URL path you throw at it. This make
     # Expected Output : HTTP 403 Forbidden
     ```
 - When a standard Layer 4 policy blocks traffic, it silently drops the packets, causing the connection to time out (returning a 000 status code). Because this Layer 7 policy uses the Envoy proxy, Cilium actively sends an HTTP error response back to the frontend container immediately.
+
+## HTTP Error Code
+### 404
+  Request is allowed by Cilium and reached the nginx container but requested page not found. 
+### 403
+  Request is blocked by Cilium L7 Proxy
