@@ -48,6 +48,7 @@ kubectl describe ciliumnetworkpolicy backend-l7-policy  -n policy-lab
 
 ### Testing
 Our network-multitool web server handles any URL path you throw at it. This makes it perfect for testing how Cilium intercepts the traffic before it reaches the application.
+- You can start hubble monitoring using following command : `cilum hubble ui`
 
 - Let's run the allowed GET request first: 
     ```bash
@@ -64,8 +65,22 @@ Our network-multitool web server handles any URL path you throw at it. This make
     ```
 - When a standard Layer 4 policy blocks traffic, it silently drops the packets, causing the connection to time out (returning a 000 status code). Because this Layer 7 policy uses the Envoy proxy, Cilium actively sends an HTTP error response back to the frontend container immediately.
 
+```bash
+# Alternative Test
+
+# Allowed (passes L7 policy, nginx returns 404)
+kubectl exec -n policy-lab deploy/frontend -- curl -s http://backend/api/v1/public
+
+# Denied path (blocked by L7 policy → 403)
+kubectl exec -n policy-lab deploy/frontend -- curl -s http://backend/api/v1/private
+
+# Denied method
+kubectl exec -n policy-lab deploy/frontend -- curl -s -X POST http://backend/api/v1/public
+```
+
 ## HTTP Error Code
 ### 404
   Request is allowed by Cilium and reached the nginx container but requested page not found. 
 ### 403
   Request is blocked by Cilium L7 Proxy
+
