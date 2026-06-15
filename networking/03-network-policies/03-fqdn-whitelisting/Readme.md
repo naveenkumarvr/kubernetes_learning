@@ -33,7 +33,11 @@ spec:
 
 ## Practicals.
 
+### 01.Deploy the apps 
 - Deploy the apps follow [Readme.md](../app/Readme.md)
+
+### FQDN Whitelist policy
+
 - Apply the manifest file using this command: `kubectl apply -f fqdn-whitelisting.yaml -n policy-lab`
 
 ## Testing
@@ -51,7 +55,7 @@ kubectl exec -n policy-lab deploy/frontend -- curl --connect-timeout 3 -I https:
 ```bash
 kubectl exec -n policy-lab deploy/frontend -- curl --connect-timeout 3 -I https://google.com
 
-# Expected output :
+# Expected output : Connection Timeout
 ```
 
 # Knowledge base
