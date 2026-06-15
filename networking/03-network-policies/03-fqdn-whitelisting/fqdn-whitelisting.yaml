@@ -1,0 +1,32 @@
+apiVersion: "cilium.io/v2"
+kind: CiliumNetworkPolicy
+metadata:
+  name: frontend-fqdn-whitelist
+  namespace: policy-lab
+
+spec:
+  endpointSelector:
+    matchLabels:
+      app: frontend
+  egress:
+  #1. Allow and Snoop DNS queries via CoreDNS
+  - toEndpoints:
+    - matchLabels:
+        "k8s:io.kubernetes.pod.namespace": kube-system
+        k8s-app: kube-dns
+    toPorts:
+    - ports:
+      - port: "53"
+        protocol: UDP
+      rules:
+        dns:
+        - matchPattern: "*" # Intercept all DNS lookups to learn their IPs
+  
+  #2. Allow actual HTTPS traffic only to the whitelisted domain
+  - toFQDNs:
+    - matchName: "api.github.com"
+    toPorts:
+    - ports:
+      - port: "443"
+        protocol: TCP
+
