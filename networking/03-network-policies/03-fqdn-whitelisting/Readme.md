@@ -36,7 +36,7 @@ spec:
 ### 01.Deploy the apps 
 - Deploy the apps follow [Readme.md](../app/Readme.md)
 
-### FQDN Whitelist policy
+### 02. FQDN Whitelist policy
 
 - Apply the manifest file using this command: `kubectl apply -f fqdn-whitelisting.yaml -n policy-lab`
 

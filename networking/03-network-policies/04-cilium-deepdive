@@ -1,0 +1,45 @@
+# Kubernetes Networking and Cilium eBPF Deep Dive
+
+This reference note explains the shift from legacy `iptables`-based Kubernetes networking to Cilium's eBPF-based datapath, with a focus on performance and identity-based security.
+
+## 1. Legacy Architecture vs Modern eBPF Datapath
+
+### Traditional Kubernetes Networking (`kube-proxy` + `iptables`)
+- **Mechanism:** Traditional CNIs rely on Linux `iptables`. `kube-proxy` watches the API server and writes chain-based rules for Pod IPs and Service endpoints.
+- **Scaling bottleneck ($O(n)$):** Rules are evaluated sequentially from top to bottom. With thousands of rules, each packet may traverse a long rule chain, increasing CPU usage and latency.
+- **Operational limitation:** Security logic is IP-based, which is harder to maintain because pod IPs are ephemeral.
+
+### Cilium Architecture (Native eBPF)
+- **Mechanism:** Cilium bypasses `iptables` by attaching eBPF programs to kernel hooks (for example, `tc` and socket-level paths).
+- **Lookup model ($O(1)$):** eBPF programs perform direct lookups in BPF Maps rather than traversing sequential rule lists.
+- **Result:** Performance remains stable even as policy and endpoint count increase.
+
+## 2. Identity-Based Security Mechanics
+
+Cilium decouples policy from pod IP addresses by using **Security Identities**.
+
+- **Label-driven identity:** Pods with the same labels are mapped to a shared numeric identity (for example, `app=frontend` -> `4102`).
+- **Identity propagation:** On egress, Cilium encodes the source identity into packet metadata/header.
+- **Fast policy check:** On ingress, destination-side eBPF checks whether source identity is allowed to talk to destination identity using a BPF Map lookup.
+- **Replica efficiency:** Scaling from 1 to 100 replicas usually does not require 100 separate policy entries if identities are unchanged.
+
+## 3. Example: Why This Scales
+
+Assume frontend identity is `4102` and backend identity is `7344`.
+
+In an IP-based model:
+- 50 frontend pods and 50 backend pods can create up to $50 \times 50 = 2500$ source-destination IP combinations.
+
+In Cilium's identity-based model:
+- Policy can stay compact as one identity-level rule, such as `4102 -> 7344`.
+
+As replicas scale up or down, the datapath policy state stays small and predictable because identities remain stable.
+
+## 4. Quick Mental Model
+
+1. Labels are translated into a numeric security identity.
+2. Source identity is attached when traffic leaves a pod.
+3. Destination node performs a constant-time BPF Map lookup.
+4. Traffic is immediately allowed or dropped.
+
+This model is the core reason Cilium delivers high-performance and scalable policy enforcement in Kubernetes.
