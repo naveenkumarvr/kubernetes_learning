@@ -2,6 +2,8 @@
 
 This demo provides a comprehensive end to end example of deploying and using an Ingress Controller with Traefik on a KIND (Kubernetes IN Docker) cluster. It demonstrates both path-based and host-based routing.
 
+> **Want to dive deeper into Ingress theory?** For in-depth understanding of Kubernetes Ingress components, architecture, and routing strategies, refer to this blog: [Kubernetes Networking Part 4: Ingress](https://claybrainer.com/kubernetes-networking-part-4-ingress-components-architecture-and-routing-strategies)
+
 ## Prerequisites
 
 Make sure the following tools are available on your machine:
