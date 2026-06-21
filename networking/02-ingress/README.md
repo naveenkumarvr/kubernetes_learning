@@ -414,11 +414,6 @@ sudo lsof -i :443
 To remove all resources and delete the cluster:
 
 ```bash
-# Navigate to the demo directory
-cd networking/02-ingress
-
-# Stop cloud-provider-kind (press Ctrl+C in the terminal where it's running)
-
 # Delete KIND cluster
 kind delete cluster --name ingress-demo
 
