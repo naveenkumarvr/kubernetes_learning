@@ -1,14 +1,13 @@
-# Path-based routing Ingress
-# This demonstrates routing traffic to different services based on URL paths
-# - /app1/* -> App1
-# - /app2/* -> App2
+# Path-based routing Ingress for App1
+# This demonstrates routing traffic to App1 service based on URL path /app1
 
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: path-based-ingress
-  namespace: default
+  name: path-based-ingress-app1
+  namespace: app1
   annotations:
+    # Tells Traefik to use the 'web' entrypoint (port 80) for routing HTTP traffic
     traefik.ingress.kubernetes.io/router.entrypoints: web
 spec:
   ingressClassName: traefik
@@ -21,15 +20,31 @@ spec:
             backend:
               service:
                 name: app1-service
-                namespace: app1
                 port:
                   number: 80
+
+---
+# Path-based routing Ingress for App2
+# This demonstrates routing traffic to App2 service based on URL path /app2
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: path-based-ingress-app2
+  namespace: app2
+  annotations:
+    # Tells Traefik to use the 'web' entrypoint (port 80) for routing HTTP traffic
+    traefik.ingress.kubernetes.io/router.entrypoints: web
+spec:
+  ingressClassName: traefik
+  rules:
+    - http:
+        paths:
           # Route /app2 to App2 service
           - path: /app2
             pathType: Prefix
             backend:
               service:
                 name: app2-service
-                namespace: app2
                 port:
                   number: 80

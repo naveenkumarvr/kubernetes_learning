@@ -1,18 +1,16 @@
-# Host-based routing Ingress
-# This demonstrates routing traffic to different services based on hostnames
-# - app1.local -> App1 service
-# - app2.local -> App2 service
-# 
+# Host-based routing Ingress for App1
+# This demonstrates routing traffic to App1 service based on hostname app1.local
+#
 # NOTE: For this to work, you need to add entries to your /etc/hosts file:
 # 127.0.0.1 app1.local
-# 127.0.0.1 app2.local
 
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: host-based-ingress
-  namespace: default
+  name: host-based-ingress-app1
+  namespace: app1
   annotations:
+    # Tells Traefik to use the 'web' entrypoint (port 80) for routing HTTP traffic
     traefik.ingress.kubernetes.io/router.entrypoints: web
 spec:
   ingressClassName: traefik
@@ -26,9 +24,27 @@ spec:
             backend:
               service:
                 name: app1-service
-                namespace: app1
                 port:
                   number: 80
+
+---
+# Host-based routing Ingress for App2
+# This demonstrates routing traffic to App2 service based on hostname app2.local
+#
+# NOTE: For this to work, you need to add entries to your /etc/hosts file:
+# 127.0.0.1 app2.local
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: host-based-ingress-app2
+  namespace: app2
+  annotations:
+    # Tells Traefik to use the 'web' entrypoint (port 80) for routing HTTP traffic
+    traefik.ingress.kubernetes.io/router.entrypoints: web
+spec:
+  ingressClassName: traefik
+  rules:
     # Route app2.local to App2 service
     - host: app2.local
       http:
@@ -38,6 +54,5 @@ spec:
             backend:
               service:
                 name: app2-service
-                namespace: app2
                 port:
                   number: 80

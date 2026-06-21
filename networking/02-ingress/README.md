@@ -146,7 +146,7 @@ helm install traefik traefik/traefik --namespace traefik --create-namespace \
 # Check Traefik pod status
 kubectl get pods -n traefik
 
-# Check Traefik services
+# Check Traefik services and get the external IP
 kubectl get svc -n traefik
 
 # Check Helm release
@@ -158,9 +158,20 @@ kubectl get ingressclass
 
 Expected output should show:
 - Traefik pod in `Running` state
-- LoadBalancer service with external IPs
+- LoadBalancer service with an external IP (e.g., `172.19.0.9`)
 - Helm release named `traefik`
 - IngressClass named `traefik`
+
+**Get the Traefik External IP:**
+The cloud-provider-kind assigns an external IP to the Traefik LoadBalancer service. You can get this IP by running:
+
+```bash
+kubectl get svc traefik -n traefik -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
+```
+
+For example, if the output is `172.19.0.9`, this is the external IP assigned by cloud-provider-kind. You'll use this IP to access your applications through the Ingress.
+
+**Note:** The external IP may vary depending on your cloud-provider-kind configuration. The IP `172.19.0.9` shown in the images is just an example.
 
 ### Step 4: Deploy Sample Applications
 
@@ -220,11 +231,21 @@ kubectl describe ingress path-based-ingress
 
 **Test path-based routing:**
 ```bash
+# Get the Traefik external IP
+EXTERNAL_IP=$(kubectl get svc traefik -n traefik -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+
 # Access App1 via path /app1
-curl http://localhost/app1
+curl http://$EXTERNAL_IP/app1
 
 # Access App2 via path /app2
-curl http://localhost/app2
+curl http://$EXTERNAL_IP/app2
+```
+
+Or use the IP directly (replace with your actual external IP):
+```bash
+# Example using IP 172.19.0.9
+curl http://172.19.0.9/app1
+curl http://172.19.0.9/app2
 ```
 
 Expected output:
@@ -268,11 +289,21 @@ kubectl describe ingress host-based-ingress
 
 **Test host-based routing:**
 ```bash
+# Get the Traefik external IP
+EXTERNAL_IP=$(kubectl get svc traefik -n traefik -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+
 # Access App1 via hostname
 curl http://app1.local
 
 # Access App2 via hostname
 curl http://app2.local
+```
+
+Or use the IP directly with the Host header (replace with your actual external IP):
+```bash
+# Example using IP 172.19.0.9
+curl -H "Host: app1.local" http://172.19.0.9
+curl -H "Host: app2.local" http://172.19.0.9
 ```
 
 Expected output:
@@ -320,11 +351,13 @@ The dashboard shows:
 - Routes traffic based on URL path prefixes
 - Uses `pathType: Prefix` for flexible path matching
 - Example: `/app1` routes all requests starting with `/app1` to App1
+- **Traefik Annotation**: `traefik.ingress.kubernetes.io/router.entrypoints: web` specifies that Traefik should use the 'web' entrypoint (port 80) for HTTP traffic. Common options: `web` (HTTP), `websecure` (HTTPS), or `web,websecure` (both). If omitted, Traefik uses all configured entrypoints by default.
 
 ### Host-Based Ingress (`ingress-host-based.yaml`)
 - Routes traffic based on the Host header
 - Requires DNS configuration (local /etc/hosts for testing)
 - Example: `app1.local` routes all requests for that host to App1
+- **Traefik Annotation**: `traefik.ingress.kubernetes.io/router.entrypoints: web` specifies that Traefik should use the 'web' entrypoint (port 80) for HTTP traffic. Common options: `web` (HTTP), `websecure` (HTTPS), or `web,websecure` (both). If omitted, Traefik uses all configured entrypoints by default.
 
 ## Troubleshooting
 
