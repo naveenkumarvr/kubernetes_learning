@@ -10,6 +10,7 @@ Make sure the following tools are available on your machine:
 - **KIND**
 - **kubectl**
 - **Helm** - Package manager for Kubernetes
+- **cloud-provider-kind** - Bridges KIND to your host for external IP support
 
 If you do not have them installed yet, use the official setup pages below:
 
@@ -18,6 +19,7 @@ If you do not have them installed yet, use the official setup pages below:
 - KIND: https://kind.sigs.k8s.io/docs/user/quick-start/
 - kubectl: https://kubernetes.io/docs/tasks/tools/
 - Helm: https://helm.sh/docs/intro/install/
+- cloud-provider-kind: https://github.com/kubernetes-sigs/cloud-provider-kind
 
 You can verify the installation with:
 
@@ -26,6 +28,7 @@ docker --version
 kind --version
 kubectl version --client
 helm version
+cloud-provider-kind --version
 ```
 
 ## Demo Overview
@@ -69,7 +72,49 @@ kubectl cluster-info --context kind-ingress-demo
 kubectl get nodes
 ```
 
-### Step 2: Install Helm and Deploy Traefik
+### Step 2: Install and Run cloud-provider-kind
+
+Since KIND doesn't have a built-in cloud provider to provide External IPs, we need to install and run cloud-provider-kind to bridge KIND to your host system.
+
+**Choose one of the following installation methods:**
+
+**Option 1: Using Go (works on all OS)**
+```bash
+go install sigs.k8s.io/cloud-provider-kind@latest
+sudo install ~/go/bin/cloud-provider-kind /usr/local/bin
+```
+
+**Option 2: Using Homebrew (macOS only - community supported)**
+```bash
+brew install cloud-provider-kind
+```
+
+**Option 3: Download released binaries**
+```bash
+# Download from https://github.com/kubernetes-sigs/cloud-provider-kind/releases
+# Extract and move to your PATH
+```
+
+**Run the provider:**
+```bash
+# Run the provider in a new terminal tab (keep this tab open)
+sudo cloud-provider-kind
+```
+
+**Why this is needed:**
+- Without cloud-provider-kind, LoadBalancer services will show `<pending>` for External IP
+- cloud-provider-kind bridges KIND to your host's network
+- This allows Traefik's LoadBalancer service to get an actual external IP
+
+**Before cloud-provider-kind:**
+![Traefik without cloud-provider](images/traefik-wo-cloudprovider.jpg)
+
+**After cloud-provider-kind:**
+![Traefik with cloud-provider](images/traefik-w-cloudprovider.jpg)
+
+**Note:** Keep the cloud-provider-kind terminal tab open throughout the demo. Close it only when you're done.
+
+### Step 3: Install Helm and Deploy Traefik
 
 First, add the Traefik Helm repository and install Traefik:
 
@@ -81,7 +126,12 @@ helm repo add traefik https://traefik.github.io/charts
 helm repo update
 
 # Install Traefik using Helm
-helm install traefik traefik/traefik --namespace traefik --create-namespace --set service.type=LoadBalancer --set service.ports.web.nodePort=30080 --set service.ports.websecure.nodePort=30443 --set dashboard.enabled=true --set dashboard.service.type=ClusterIP
+helm install traefik traefik/traefik --namespace traefik --create-namespace \
+  --set service.type=LoadBalancer \
+  --set service.ports.web.nodePort=30080 \
+  --set service.ports.websecure.nodePort=30443 \
+  --set api.dashboard=true \
+  --set ingressRoute.dashboard.enabled=true
 ```
 
 **What this does:**
@@ -112,7 +162,7 @@ Expected output should show:
 - Helm release named `traefik`
 - IngressClass named `traefik`
 
-### Step 3: Deploy Sample Applications
+### Step 4: Deploy Sample Applications
 
 Deploy two simple HTTP echo server applications:
 
@@ -145,7 +195,7 @@ kubectl run test-pod --image=busybox --rm -it --restart=Never -- wget -qO- http:
 kubectl run test-pod --image=busybox --rm -it --restart=Never -- wget -qO- http://app2-service.app2
 ```
 
-### Step 4: Path-Based Routing
+### Step 5: Path-Based Routing
 
 Deploy an Ingress that routes traffic based on URL paths:
 
@@ -181,7 +231,7 @@ Expected output:
 - `/app1` returns: "Hello from App1! You are accessing the first application."
 - `/app2` returns: "Hello from App2! You are accessing the second application."
 
-### Step 5: Host-Based Routing
+### Step 6: Host-Based Routing
 
 Deploy an Ingress that routes traffic based on hostnames:
 
@@ -229,7 +279,7 @@ Expected output:
 - `app1.local` returns: "Hello from App1! You are accessing the first application."
 - `app2.local` returns: "Hello from App2! You are accessing the second application."
 
-### Step 6: Access Traefik Dashboard
+### Step 7: Access Traefik Dashboard
 
 Access the Traefik dashboard to monitor your ingress controller:
 
@@ -331,6 +381,10 @@ sudo lsof -i :443
 To remove all resources and delete the cluster:
 
 ```bash
+# Navigate to the demo directory
+cd networking/02-ingress
+
+# Stop cloud-provider-kind (press Ctrl+C in the terminal where it's running)
 
 # Delete KIND cluster
 kind delete cluster --name ingress-demo
