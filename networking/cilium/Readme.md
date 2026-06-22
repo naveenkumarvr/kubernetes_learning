@@ -74,7 +74,9 @@ kubectl get nodes
 
 
 ## Install Required CRDs
-- Before running that install command, verify that the Kubernetes Gateway API CRDs (Custom Resource Definitions) are installed.
+- Before we deploy our application, the cluster must understand what an HTTPRoute is. The Gateway API is a set of Custom Resource Definitions (CRDs) that provide a more expressive, extensible, and role-oriented interface than standard Ingress.
+- Because Gateway API CRDs do not come pre-installed in a standard Kubernetes or Kind cluster by default, we must install them manually so Cilium can recognize them.
+- Let's start by installing the standard Gateway API v1.1.0 CRDs into your cluster. Run the following command in your terminal:
 ```bash
 kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.1.0/standard-install.yaml
 ```
