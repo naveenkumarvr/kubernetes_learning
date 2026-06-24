@@ -1,0 +1,46 @@
+# Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: my-app
+  name: app-v1
+  namespace: app-space
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: my-app
+      version: v1
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: my-app
+        version: v1
+    spec:
+      containers:
+      - image: hashicorp/http-echo:1.0.0
+        name: http-echo
+        args: ["-text=Responding from Version 1 🟢"]
+        resources: {}
+        ports:
+        - containerPort: 5678
+status: {}
+
+---
+# Service 
+apiVersion: v1
+kind: Service
+metadata:
+  name: svc-v1
+  namespace: app-space
+spec:
+  ports:
+  - port: 80
+    targetPort: 5678
+  selector:
+    app: my-app
+    version: v1

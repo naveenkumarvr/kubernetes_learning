@@ -1,0 +1,21 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: app-resilience-route
+  namespace: app-space
+spec:
+  parentRefs:
+  - name: infra-gateway
+    namespace: infra-gateway
+  rules:
+  - matches:
+    - path:
+        type: PathPrefix
+        value: /
+    backendRefs:
+    - name: svc-v1
+      port: 80
+    # Official Gateway API L7 Timeouts
+    timeouts:
+      request: 1s          # The entire client round-trip must finish within 1s
+      backendRequest: 250ms # A single connection attempt to a pod must finish within 250ms
