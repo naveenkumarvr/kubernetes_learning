@@ -1,0 +1,15 @@
+# gateway.yaml
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: infra-gateway
+  namespace: infra-gateway
+spec:
+  gatewayClassName: cilium # This tells the cluster to use Cilium's controller
+  listeners:
+  - name: http
+    protocol: HTTP
+    port: 80
+    allowedRoutes:
+      namespaces:
+        from: All # Allows Routes across namespace is allowed
