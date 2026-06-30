@@ -1,0 +1,17 @@
+apiVersion: "cilium.io/v2"
+kind: CiliumNetworkPolicy
+metadata:
+  name: app-v2-mtls-policy
+  namespace: app-space
+spec:
+  endpointSelector:
+    matchLabels:
+      app: my-app
+      version: v2
+  ingress:
+  - fromEndpoints:
+    - matchLabels:
+        app: my-app
+        version: v1
+    authentication:
+      mode: "required"

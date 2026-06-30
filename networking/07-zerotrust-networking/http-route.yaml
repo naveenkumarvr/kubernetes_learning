@@ -1,0 +1,20 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: my-app-httproute
+  namespace: app-space
+spec:
+  parentRefs:
+  - name: infra-gateway
+    namespace: infra-gateway
+  rules:
+  - matches:
+    - headers:
+      - name: X-Beta-User
+        value: "true"
+    backendRefs:
+    - name: svc-v2
+      port: 80
+  - backendRefs:
+    - name: svc-v1
+      port: 80
