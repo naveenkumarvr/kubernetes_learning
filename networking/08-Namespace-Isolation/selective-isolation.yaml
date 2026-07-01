@@ -1,0 +1,18 @@
+apiVersion: "cilium.io/v2"
+kind: CiliumNetworkPolicy
+metadata:
+  name: deny-cross-namespace-ingress
+  namespace: tenant-prod
+spec:
+  endpointSelector:
+    matchLabels: {}
+  ingress:
+  # Rule A: Keep allowing anything from inside tenant-prod itself
+  - fromEndpoints:
+    - matchLabels:
+        "k8s:io.kubernetes.pod.namespace": tenant-prod
+  # Rule B: The New Exception - Allow specific authorized pods from tenant-dev
+  - fromEndpoints:
+    - matchLabels:
+        "k8s:io.kubernetes.pod.namespace": tenant-dev
+        "app": authorized-client

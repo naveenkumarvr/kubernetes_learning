@@ -1,0 +1,17 @@
+apiVersion: "cilium.io/v2"
+# 1. Note the Kind change!
+kind: CiliumClusterwideNetworkPolicy
+metadata:
+  name: global-namespace-isolation
+  # 2. NO NAMESPACE FIELD HERE! It applies globally.
+spec:
+  endpointSelector:
+    matchLabels:
+      # Targets ALL pods in the entire cluster
+      {} 
+  ingress:
+  - fromEndpoints:
+    - matchLabels:
+        # Allows pods to talk to each other ONLY if their namespace labels match exactly
+        # "Look at the namespace of the destination pod (the endpoint receiving the traffic). Now, only allow the incoming packet if the source pod comes from that exact same namespace."
+        "k8s:io.kubernetes.pod.namespace": "from-endpoint"

@@ -1,0 +1,14 @@
+apiVersion: "cilium.io/v2"
+kind: CiliumNetworkPolicy
+metadata:
+  name: deny-cross-namespace-ingress
+  namespace: tenant-prod
+spec:
+  # This targets all pods within the tenant-prod namespace
+  endpointSelector:
+    matchLabels: {}
+  ingress:
+  - fromEndpoints:
+    - matchLabels:
+        # Crucial Cilium identity mapping: Only allow pods if they belong to tenant-prod
+        "k8s:io.kubernetes.pod.namespace": tenant-prod
